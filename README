@@ -118,3 +118,44 @@ Contributors
 ------------
 
   - Jerome Leseinne for identifying a bug in the is_valid constraint and null blocks
+  
+  
+DFXML Modifications
+===================
+
+Overview
+--------
+The purpose of these modifications is to add provisions for formatting
+output in the DFXML format. This will be done by adapting the bodyfile
+output code.
+
+Changed and added code will be marked as so.
+
+Changes
+-------
+- Added command line flag for outputting in DFXML. The new usage instructions are:
+
+usage: INDXParse.py [-h] [-c | -b | -x] [-d] filename
+
+Parse NTFS INDX files.
+
+positional arguments:
+  filename    Input INDX file path
+
+optional arguments:
+  -h, --help  show this help message and exit
+  -c          Output CSV
+  -b          Output Bodyfile
+  -x          Output DFXML
+  -d          Find entries in slack space
+
+
+
+TODO
+----
+
+- [x] Add command line flag for outputting in DFXML
+- [ ] Handle creating DFXMLObject for parsing
+- [ ] Write function to convert INDX entries into FileObjects; entry_dfxml
+- [ ] Add these objects to DFXMLObject
+- [ ] Print the DFXMLObject

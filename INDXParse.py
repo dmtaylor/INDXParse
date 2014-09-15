@@ -32,6 +32,11 @@ from datetime import datetime
 import argparse
 global verbose
 
+#added packages for dfxml
+import xml.etree.ElementTree as ET
+import dfxml
+import Objects
+
 INDEX_NODE_BLOCK_SIZE = 4096
 
 
@@ -805,12 +810,17 @@ def entry_bodyfile(entry, filename=False):
 
     return u"0|%s|0|0|0|0|%s|%s|%s|%s|%s" % (fn, entry.logical_size(), accessed, modified, changed, created)
 
+def entry_dfxml(entry, filename-False):
+    # creates FileObject for the given entry and returns it.
+    # Uses same info as the bodyfile entry
+    pass #TODO
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse NTFS INDX files.')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-c', action="store_true", dest="csv", default=False, help="Output CSV")
     group.add_argument('-b', action="store_true", dest="bodyfile", default=False, help="Output Bodyfile")
+    group.add_argument('-x', action="store_true", dest="dfxml", default=False, help="Output DFXML") #added dfxml flag
     parser.add_argument('-d', action="store_true", dest="deleted", help="Find entries in slack space")
     parser.add_argument('-v', action="store_true", dest="verbose", help="Print debugging information")
     parser.add_argument('-t', action="store", choices=["dir", "sdh", "sii"], default="dir", dest="index_type", help="Choose index type (dir, sdh, or sii)")
@@ -837,6 +847,11 @@ if __name__ == '__main__':
             print("SDH KEY,\tSDH DATA,\tSECURITY ID KEY,\tSECURITY ID DATA,\tSDS SECURITY DESCRIPTOR OFFSET,\tSDS SECURITY DESCRIPTOR SIZE")
         if results.index_type == "sii":
             print("SDH DATA,\tSECURITY ID KEY,\tSECURITY ID DATA,\tSDS SECURITY DESCRIPTOR OFFSET,\tSDS SECURITY DESCRIPTOR SIZE")
+
+    if results.dfxml:
+        #create DFXMLObject here
+        pass #TODO
+
 
     with open(results.filename, "rb") as f:
         b = array.array("B", f.read())
