@@ -812,7 +812,34 @@ def entry_bodyfile(entry, filename=False):
 def entry_dfxml(entry, filename-False):
     # creates FileObject for the given entry and returns it.
     # Uses same info as the bodyfile entry
-    pass #TODO
+    fo = Objects.FileObject()
+    
+    if filename:
+        pass #fo.filename <- filename
+    else:
+        pass #fo.filename <- entry.filename
+        
+    try:
+        fo.mtime(int(time.mktime(entry.modified_time_safe().timetuple())))
+    except ValueError:
+        fo.mtime(int(time.mktime(datetime(1970, 1, 1, 0, 0, 0).timetuple())))
+
+    try:
+        fo.atime(int(time.mktime(entry.accessed_time_safe().timetuple())))
+    except ValueError:
+        fo.atime(int(time.mktime(datetime(1970, 1, 1, 0, 0, 0).timetuple())))
+
+    try:
+        fo.ctime(int(time.mktime(entry.changed_time_safe().timetuple())))
+    except ValueError:
+        fo.ctime(int(time.mktime(datetime(1970, 1, 1, 0, 0, 0).timetuple())))
+
+    try:
+        fo.crtime(int(time.mktime(entry.created_time_safe().timetuple())))
+    except ValueError:
+        fo.crtime(int(time.mktime(datetime.min.timetuple())))
+        
+    return fo
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse NTFS INDX files.')
