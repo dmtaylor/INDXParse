@@ -34,7 +34,6 @@ global verbose
 
 #added packages for dfxml
 import xml.etree.ElementTree as ET
-import dfxml
 import Objects
 
 INDEX_NODE_BLOCK_SIZE = 4096
@@ -849,8 +848,7 @@ if __name__ == '__main__':
             print("SDH DATA,\tSECURITY ID KEY,\tSECURITY ID DATA,\tSDS SECURITY DESCRIPTOR OFFSET,\tSDS SECURITY DESCRIPTOR SIZE")
 
     if results.dfxml:
-        #create DFXMLObject here
-        pass #TODO
+        d = Objects.DFXMLObject()
 
 
     with open(results.filename, "rb") as f:
@@ -875,6 +873,11 @@ if __name__ == '__main__':
                     print(entry_bodyfile(e))
                 except UnicodeEncodeError:
                     print(entry_bodyfile(e, e.filename().encode("ascii", "replace") + " (error decoding filename)"))
+            elif results.dfxml: #creates a file object and appends it to the DFXML object
+                try:
+                    d.append(entry_dfxml(e))
+                except UnicodeEncodeError:
+                    d.append(entry_dfxml(e, e.filename().encode("ascii", "replace") + " (error decoding filename)"))
         if results.deleted:
             for e in h.deleted_entries():
                 fn = e.filename() + " (slack at %s)" % (hex(e.offset()))
@@ -889,5 +892,12 @@ if __name__ == '__main__':
                         print(entry_bodyfile(e, fn))
                     except UnicodeEncodeError:
                         print(entry_bodyfile(e, bad_fn))
+                elif results.dfxml: # same as above
+                    try:
+                        d.append(entry_dfxml(e, fn))
+                    except UnicodeEncodeError:
+                        print(entry_dfxml(e, bad_fn))
 
         off = align(h.end_offset(), INDEX_NODE_BLOCK_SIZE)
+    if results.dfxml:
+        d.print_dfxml()

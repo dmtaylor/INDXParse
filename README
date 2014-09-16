@@ -155,7 +155,7 @@ TODO
 ----
 
 - [x] Add command line flag for outputting in DFXML
-- [ ] Handle creating DFXMLObject for parsing
+- [x] Handle creating DFXMLObject for parsing
 - [ ] Write function to convert INDX entries into FileObjects; entry_dfxml
-- [ ] Add these objects to DFXMLObject
-- [ ] Print the DFXMLObject
+- [x] Add these objects to DFXMLObject
+- [x] Print the DFXMLObject
