@@ -820,24 +820,24 @@ def entry_dfxml(entry, filename-False):
         pass #fo.filename <- entry.filename
         
     try:
-        fo.mtime(int(time.mktime(entry.modified_time_safe().timetuple())))
+        fo.mtime = entry.modified_time_safe().isoformat()
     except ValueError:
-        fo.mtime(int(time.mktime(datetime(1970, 1, 1, 0, 0, 0).timetuple())))
+        fo.mtime = datetime(1970, 1, 1, 0, 0, 0).isoformat()
 
     try:
-        fo.atime(int(time.mktime(entry.accessed_time_safe().timetuple())))
+        fo.atime = entry.accessed_time_safe().isoformat()
     except ValueError:
-        fo.atime(int(time.mktime(datetime(1970, 1, 1, 0, 0, 0).timetuple())))
+        fo.atime = datetime(1970, 1, 1, 0, 0, 0).isoformat()
 
     try:
-        fo.ctime(int(time.mktime(entry.changed_time_safe().timetuple())))
+        fo.ctime = entry.changed_time_safe().isoformat()
     except ValueError:
-        fo.ctime(int(time.mktime(datetime(1970, 1, 1, 0, 0, 0).timetuple())))
+        fo.ctime = datetime(1970, 1, 1, 0, 0, 0).isoformat()
 
     try:
-        fo.crtime(int(time.mktime(entry.created_time_safe().timetuple())))
+        fo.crtime = entry.created_time_safe().isoformat()
     except ValueError:
-        fo.crtime(int(time.mktime(datetime.min.timetuple())))
+        fo.crtime = datetime.min.isoformat()
         
     return fo
 
