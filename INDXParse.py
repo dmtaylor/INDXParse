@@ -815,29 +815,29 @@ def entry_dfxml(entry, filename-False):
     fo = Objects.FileObject()
     
     if filename:
-        pass #fo.filename <- filename
+        fo.filename = filename
     else:
-        pass #fo.filename <- entry.filename
+        fo.filename = entry.filename
         
     try:
         fo.mtime = entry.modified_time_safe().isoformat()
     except ValueError:
-        fo.mtime = datetime(1970, 1, 1, 0, 0, 0).isoformat()
+        fo.mtime = None
 
     try:
         fo.atime = entry.accessed_time_safe().isoformat()
     except ValueError:
-        fo.atime = datetime(1970, 1, 1, 0, 0, 0).isoformat()
+        fo.atime = None
 
     try:
         fo.ctime = entry.changed_time_safe().isoformat()
     except ValueError:
-        fo.ctime = datetime(1970, 1, 1, 0, 0, 0).isoformat()
+        fo.ctime = None
 
     try:
         fo.crtime = entry.created_time_safe().isoformat()
     except ValueError:
-        fo.crtime = datetime.min.isoformat()
+        fo.crtime = None
         
     return fo
 
@@ -923,7 +923,7 @@ if __name__ == '__main__':
                     try:
                         d.append(entry_dfxml(e, fn))
                     except UnicodeEncodeError:
-                        print(entry_dfxml(e, bad_fn))
+                        d.append(entry_dfxml(e, bad_fn))
 
         off = align(h.end_offset(), INDEX_NODE_BLOCK_SIZE)
     if results.dfxml:
