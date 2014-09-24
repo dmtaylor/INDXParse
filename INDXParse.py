@@ -902,9 +902,13 @@ if __name__ == '__main__':
                     print(entry_bodyfile(e, e.filename().encode("ascii", "replace") + " (error decoding filename)"))
             elif results.dfxml: #creates a file object and appends it to the DFXML object
                 try:
-                    d.append(entry_dfxml(e))
+                    file_obj = entry_dfxml(e)
+                    file_obj.alloc_name = 1
+                    d.append(file_obj)
                 except UnicodeEncodeError:
-                    d.append(entry_dfxml(e, e.filename().encode("ascii", "replace") + " (error decoding filename)"))
+                    file_obj = entry_dfxml(e, e.filename().encode("ascii", "replace") + " (error decoding filename)")
+                    file_obj.alloc_name = 1
+                    d.append(file_obj)
         if results.deleted:
             for e in h.deleted_entries():
                 fn = e.filename() + " (slack at %s)" % (hex(e.offset()))
@@ -921,9 +925,13 @@ if __name__ == '__main__':
                         print(entry_bodyfile(e, bad_fn))
                 elif results.dfxml: # same as above
                     try:
-                        d.append(entry_dfxml(e, fn))
+                        file_obj = entry_dfxml(e, fn)
+                        file_obj.alloc_name = 0
+                        d.append(file_obj)
                     except UnicodeEncodeError:
-                        d.append(entry_dfxml(e, bad_fn))
+                        file_obj = entry_dfxml(e, bad_fn)
+                        file_obj.alloc_name = 0
+                        d.append(file_obj)
 
         off = align(h.end_offset(), INDEX_NODE_BLOCK_SIZE)
     if results.dfxml:
