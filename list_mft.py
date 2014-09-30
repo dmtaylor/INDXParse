@@ -82,6 +82,43 @@ def format_bodyfile(path, size, inode, owner_id, info, attributes=None):
                                                  owner_id,
                                                  size, accessed, modified,
                                                  changed, created)
+                                                 
+# format_dfxml: return file object made from given data
+def format_dfxml(path, size, inode, owner_id, info, attributes=None):
+    
+    fo = Objects.FileObject()
+    
+    if not attributes:
+        attributes =[]
+    try:
+        fo.mtime = info.modified_time().isoformat()
+    except (ValueError, AttributeError):
+        fo.mtime = None
+    try:
+        fo.atime = info.accessed_time().isoformat()
+    except (ValueError, AttributeError):
+        fo.atime = None
+    try:
+        fo.ctime = info.changed_time().isoformat()
+    except (ValueError, AttributeError):
+        fo.ctime = None
+    try:
+        fo.crtime = info.created_time().isoformat()
+    except (ValueError, AttributeError):
+        fo.crtime = None
+        
+    fo.inode = inode
+    fo.filesize = size
+    
+    # Appending attributes to file path, as in bodyfile output
+    attributes_text = ""
+    if len(attributes) > 0:
+        attributes_text = " (%s)" % (", ".join(attributes))
+    fo.filename = path + attributes_text
+    
+    return fo
+    
+
 
 
 def output_mft_record(mft_enumerator, record, prefix):

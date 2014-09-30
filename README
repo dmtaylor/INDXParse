@@ -164,7 +164,7 @@ In list_mft.py
 
 - [x] Add command line flag for outputting in DFXML
 - [x] Handle creating DFXMLObject for parsing
-- [ ] Write function to convert MFT entries into FileObjects; format_bodyfile -> format_dfxml
+- [x] Write function to convert MFT entries into FileObjects; format_bodyfile -> format_dfxml
 - [ ] Write function to handle entire MFT record; output_mft_record -> output_dfxml_record
 - [ ] Integrate with DFXMLObject
 - [ ] Print the DFXMLObject
