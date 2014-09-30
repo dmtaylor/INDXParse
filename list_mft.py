@@ -38,6 +38,8 @@ import datetime
 from jinja2 import Environment
 import argparse
 
+import Objects
+
 from BinaryParser import Mmap
 from MFT import Cache
 from MFT import MFTEnumerator
@@ -48,6 +50,7 @@ from MFT import StandardInformationFieldDoesNotExist
 from get_file_info import make_model
 from Progress import NullProgress
 from Progress import ProgressBarProgress
+
 
 
 def format_bodyfile(path, size, inode, owner_id, info, attributes=None):
@@ -246,6 +249,8 @@ def main():
                         help="File containing output format specification")
     parser.add_argument('--json', action="store_true", dest="json",
                         help="Output in JSON format")
+    parser.add_argument('--dfxml', action="store_true", dest="dfxml",
+                        help="Output in DFXML format") #dfxml option
     parser.add_argument('-f', action="store", metavar="regex",
                         nargs=1, dest="filter",
                         help="Only consider entries whose path "
@@ -272,9 +277,12 @@ def main():
     if results.json:
         flags_count += 1
         pass
+    if results.dfxml: #
+        flags_count += 1
+        pass
 
     if flags_count > 1:
-        sys.stderr.write("Only one of --format, --format_file, --json may be provided.\n")
+        sys.stderr.write("Only one of --format, --format_file, --json, --dfxml may be provided.\n")
         sys.exit(-1)
     elif flags_count == 1:
         use_default_output = False
@@ -282,6 +290,9 @@ def main():
         flags_count += 1
         template = get_default_template(env)
         use_default_output = True
+        
+    if results.dfxml: #make dfxml object here
+        dfxml_doc = Objects.DFXMLObject()
 
     if results.progress:
         progress_cls = ProgressBarProgress
