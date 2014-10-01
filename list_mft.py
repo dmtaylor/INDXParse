@@ -229,6 +229,128 @@ def output_mft_record(mft_enumerator, record, prefix):
             print "# failed to print: %s" % (list(path))
 
 
+def dfxml_mft_record(mft_enumerator, record, prefix, dfxml_item):
+    """
+    Attach all FileObjects
+      associated with a single record. This includes
+      standard information, filename information,
+      and any resident directory index entries.
+    """
+    tags = []
+    if not record.is_active():
+        tags.append("inactive")
+
+    path = prefix + "\\" + mft_enumerator.get_path(record)
+    si = record.standard_information()
+    fn = record.filename_information()
+
+    if not record.is_active() and not fn:
+        return
+
+    inode = record.mft_record_number()
+    if record.is_directory():
+        size = 0
+    else:
+        data_attr = record.data_attribute()
+        if data_attr and data_attr.non_resident() > 0:
+            size = data_attr.data_size()
+        elif fn:
+            size = fn.logical_size()
+        else:
+            size = 0
+
+    ADSs = []  # list of (name, size)
+    for attr in record.attributes():
+        if attr.type() != ATTR_TYPE.DATA or len(attr.name()) == 0:
+            continue
+        if attr.non_resident() > 0:
+            size = attr.data_size()
+        else:
+            size = attr.value_length()
+        ADSs.append((attr.name(), size))
+
+    si_index = 0
+    if si:
+        try:
+            si_index = si.security_id()
+        except StandardInformationFieldDoesNotExist:
+            pass
+
+    indices = []  # list of (filename, size, reference, info)
+    slack_indices = []  # list of (filename, size, reference, info)
+    indxroot = record.attribute(ATTR_TYPE.INDEX_ROOT)
+    if indxroot and indxroot.non_resident() == 0:
+        # TODO(wb): don't use IndxRootHeader
+        irh = IndexRootHeader(indxroot.value(), 0, False)
+        for e in irh.node_header().entries():
+            indices.append((e.filename_information().filename(),
+                            e.mft_reference(),
+                            e.filename_information().logical_size(),
+                            e.filename_information()))
+
+        for e in irh.node_header().slack_entries():
+            slack_indices.append((e.filename_information().filename(),
+                                  e.mft_reference(),
+                                  e.filename_information().logical_size(),
+                                  e.filename_information()))
+
+    # si
+    if si:
+        try:
+            fo = format_dfxml(path, size, inode, si_index, si, tags)
+            dfxml_item.append(fo)
+        except UnicodeEncodeError:
+            print "# failed to print: %s" % (list(path))
+
+    # fn
+    if fn:
+        tags = ["filename"]
+        if not record.is_active():
+            tags.append("inactive")
+            is_active = 0
+        else:
+            is_active = 1
+        try:
+            fo = format_dfxml(path, size, inode, si_index, fn, tags)
+            fo.alloc_inode = is_active #Check this
+            dfxml_item.append(fo)
+        except UnicodeEncodeError:
+            print "# failed to print: %s" % (list(path))
+
+    # ADS
+    for ads in ADSs:
+        tags = []
+        if not record.is_active():
+            tags.append("inactive")
+            is_active = 0
+        else:
+            is_active = 1
+        try:
+            fo = format_dfxml(path + ":" + ads[0], ads[1], inode, si_index, si or {}, tags)
+            fo.alloc_inode = is_active #Check this
+            dfxml_item.append(fo)
+        except UnicodeEncodeError:
+            print "# failed to print: %s" % (list(path))
+
+    # INDX
+    for indx in indices:
+        tags = ["indx"]
+        try:
+            fo = format_dfxml(path + "\\" + indx[0], indx[1], MREF(indx[2]), 0, indx[3], tags)
+            fo.alloc_name = 1
+            dfxml_item.append(fo)
+        except UnicodeEncodeError:
+            print "# failed to print: %s" % (list(path))
+
+    for indx in slack_indices:
+        tags = ["indx", "slack"]
+        try:
+            fo = format_dfxml(path + "\\" + indx[0], indx[1], MREF(indx[2]), 0, indx[3], tags)
+            fo.alloc_name = 0
+            dfxml_item.append(fo)
+        except UnicodeEncodeError:
+            print "# failed to print: %s" % (list(path))
+
 def unixtimestampformat(value):
     """
     A custom Jinja2 filter for converting a datetime.datetime
