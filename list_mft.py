@@ -85,6 +85,18 @@ def format_bodyfile(path, size, inode, owner_id, info, attributes=None):
                                                  
 # format_dfxml: return file object made from given data
 def format_dfxml(path, size, inode, owner_id, info, attributes=None):
+    """
+    Takes in information gained from calling function, generates a
+    FileObject, populates the fields with the information, and returns
+    the FileObject.
+    Path: string
+    size: int
+    inode: int
+    owner_id: int
+    attributes: list of attributes of file
+    info: information from record
+    """
+    
     
     fo = Objects.FileObject()
     
@@ -317,7 +329,8 @@ def dfxml_mft_record(mft_enumerator, record, prefix, dfxml_item):
         except UnicodeEncodeError:
             print "# failed to print: %s" % (list(path))
 
-    # ADS
+    # ADS, NOTE: Future implementations can work with ADS's here.
+    """
     for ads in ADSs:
         tags = []
         if not record.is_active():
@@ -331,13 +344,14 @@ def dfxml_mft_record(mft_enumerator, record, prefix, dfxml_item):
             dfxml_item.append(fo)
         except UnicodeEncodeError:
             print "# failed to print: %s" % (list(path))
+    """
 
     # INDX
     for indx in indices:
         tags = ["indx"]
         try:
             fo = format_dfxml(path + "\\" + indx[0], indx[1], MREF(indx[2]), 0, indx[3], tags)
-            fo.alloc_name = 1
+            fo.alloc_inode = 1
             dfxml_item.append(fo)
         except UnicodeEncodeError:
             print "# failed to print: %s" % (list(path))
@@ -346,7 +360,7 @@ def dfxml_mft_record(mft_enumerator, record, prefix, dfxml_item):
         tags = ["indx", "slack"]
         try:
             fo = format_dfxml(path + "\\" + indx[0], indx[1], MREF(indx[2]), 0, indx[3], tags)
-            fo.alloc_name = 0
+            fo.alloc_inode = 0
             dfxml_item.append(fo)
         except UnicodeEncodeError:
             print "# failed to print: %s" % (list(path))
@@ -484,12 +498,18 @@ def main():
                 print(json.dumps(m, cls=MFTEncoder, indent=2) + ",")
                 progress.set_current(record.inode)
             print("]")
+        elif results.dfml:
+            for record, record_path in enum.enumerate_paths():
+                dfxml_mft_record(enum, record, results.prefix[0], dfxml_doc)
+                progress.set_current(record.inode)
         else:
             for record, record_path in enum.enumerate_paths():
                 sys.stdout.write(template.render(record=make_model(record, record_path),
                                                  prefix=results.prefix[0]) + "\n")
                 progress.set_current(record.inode)
         progress.set_complete()
+    if results.dfxml:
+        dfxml_doc.print_dfxml()
 
 
 if __name__ == "__main__":

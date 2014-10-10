@@ -166,5 +166,5 @@ In list_mft.py
 - [x] Handle creating DFXMLObject for parsing
 - [x] Write function to convert MFT entries into FileObjects; format_bodyfile -> format_dfxml
 - [x?] Write function to handle entire MFT record; output_mft_record -> output_dfxml_record
-- [ ] Integrate with DFXMLObject
-- [ ] Print the DFXMLObject
+- [x] Integrate with DFXMLObject
+- [x] Print the DFXMLObject
